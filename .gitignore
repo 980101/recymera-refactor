@@ -12,3 +12,4 @@
 /.gradle/
 /.idea/
 .tflite
+app/src/main/assets/model.tflite
