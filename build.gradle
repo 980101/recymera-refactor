@@ -17,7 +17,12 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+
+        // [삭제] jcenter()는 더 이상 업데이트가 없습니다.
+        //jcenter()
+
+        // [추가] 저장소를 설정합니다.
+        mavenCentral()
     }
 }
 

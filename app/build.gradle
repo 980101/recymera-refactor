@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "org.tensorflow.lite.examples.classification"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
     }
@@ -42,10 +42,14 @@ dependencies {
 
     // Build off of nightly TensorFlow Lite
     // TODO: Add TFLite dependencies
-    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
-    implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly-SNAPSHOT'
 
-    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
+    // [삭제] 0.0.0-nightly-SNAPSHOT은 올바른 버전이 아닙니다.
+    //implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
+    //implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly-SNAPSHOT'
+    // [추가] 최신 권장 버전으로 설정합니다.
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.12.0'
+
+    implementation 'org.tensorflow:tensorflow-lite-support:0.4.3'
 
     // Use local TensorFlow library
     // implementation 'org.tensorflow:tensorflow-lite-local:0.0.0'
