@@ -1,30 +1,25 @@
 ⭐ 리팩토링 진행 중입니다 !
 
-# Recymera
-사물인식 기능을 이용해 분리수거를 도와주는 앱
+# 2025.11.18
+변경 사항:
+jcenter() 저장소 제거: jcenter()는 더 이상 업데이트되지 않으므로 삭제.
 
-## 스크린샷
-1. 메인 화면
+mavenCentral() 추가: 안정적인 최신 라이브러리 버전 관리를 위해 mavenCentral() 저장소 추가.
 
-![main-page-v4–2-github](https://user-images.githubusercontent.com/47620950/116096154-01547a80-a6e4-11eb-8edd-84957eb49a7a.png)
+이유:
 
-2. 검색 화면
+**jcenter()**는 2021년 2월 1일을 기점으로 더 이상 업데이트되지 않으며, 구버전의 라이브러리가 여전히 존재할 수 있음.
 
-![search-page-v4-github](https://user-images.githubusercontent.com/47620950/116096639-6ad48900-a6e4-11eb-8e79-6e0b3fc5e6af.png)
-![search-page-v4-searched-github](https://user-images.githubusercontent.com/47620950/116096689-745df100-a6e4-11eb-99c1-21a9ee9e5e36.png)
+최신 라이브러리를 안정적으로 사용하기 위해 **mavenCentral()**로 변경.
 
-3. 상세 페이지
+변경 사항:
 
-![detail-page-v4-github](https://user-images.githubusercontent.com/47620950/116096959-ac653400-a6e4-11eb-9ac5-0deddc025df9.png)
+잘못된 버전 제거: 0.0.0-nightly-SNAPSHOT 버전은 올바른 버전이 아니므로 주석 처리하여 삭제.
 
-4. 카메라 화면
+최신 권장 버전으로 변경: TensorFlow Lite GPU 라이브러리 버전을 **2.12.0**으로 변경.
 
-![camera-page–focused-v3-github](https://user-images.githubusercontent.com/47620950/116096932-a53e2600-a6e4-11eb-890b-505bee20f242.png)
+이유:
 
-## 구현 상황
-- [x] 사물인식 기능
-- [x] 분리수거 조회 기능
-- [x] 검색 기능
-- [x] 상세 유형별 게시
-- [x] Shake 기능
-- [x] 디자인 적용
+0.0.0-nightly-SNAPSHOT 버전은 정식 출시된 버전이 아니며, 불안정하거나 최신 기능을 제공할 수 있지만 안정성 문제가 있을 수 있음.
+
+TensorFlow Lite GPU의 최신 안정화 버전인 **2.12.0**으로 변경하여 안정적이고, 최신 기능을 사용하는 것이 바람직함.
