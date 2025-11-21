@@ -21,7 +21,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
@@ -51,6 +50,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -87,7 +88,7 @@ public abstract class CameraActivity extends AppCompatActivity
   private Runnable postInferenceCallback;
   private Runnable imageConverter;
   private FrameLayout bottomSheetLayout;
-  private LinearLayout gestureLayout, bottomSheetBackground;
+  private LinearLayout gestureLayout;
   private BottomSheetBehavior<LinearLayout> sheetBehavior;
   protected TextView recognitionTextView,
       recognition1TextView,
@@ -135,15 +136,10 @@ public abstract class CameraActivity extends AppCompatActivity
     deviceSpinner = findViewById(R.id.device_spinner);
     */
     bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
-    //bottomSheetBackground = findViewById(R.id.detected_label);
+
     // gestureLayout : bottom_sheet 에서 사물인식 결과의 텍스트가 나오는 layout
     gestureLayout = findViewById(R.id.gesture_layout);
-    /*
-    sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-     */
-    /*
-    bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
-     */
+
 
     ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
 
@@ -153,18 +149,6 @@ public abstract class CameraActivity extends AppCompatActivity
           @Override
           public void onGlobalLayout() {
             gestureLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-
-            //                int width = bottomSheetLayout.getMeasuredWidth();
-
-            /* bottom_sheet의 높이로 설정해주었다.
-            int height = bottomSheetLayout.getMeasuredHeight();
-            */
-            //int height = gestureLayout.getMeasuredHeight();
-
-            /* setPeekHeight() : bottom_sheet 가 접힐 때 bottom_sheet의 높이를 설정한다.
-            sheetBehavior.setPeekHeight(height);
-            */
           }
         });
 
@@ -210,12 +194,7 @@ public abstract class CameraActivity extends AppCompatActivity
     // 순서대로 클래스 명과 퍼센트 (ex. plastic 18%)
     recognitionTextView = findViewById(R.id.detected_item);
     recognitionInfoTextView = findViewById(R.id.detected_item_info);
-    //recognitionValueTextView = findViewById(R.id.detected_item_value);
     recognitionImageView = findViewById(R.id.detected_item_img);
-//    recognition1TextView = findViewById(R.id.detected_item1);
-//    recognition1ValueTextView = findViewById(R.id.detected_item1_value);
-//    recognition2TextView = findViewById(R.id.detected_item2);
-//    recognition2ValueTextView = findViewById(R.id.detected_item2_value);
 
     // 사물 인식 metaData
     /*
@@ -575,6 +554,7 @@ public abstract class CameraActivity extends AppCompatActivity
   //
   //
 
+  private GradientDrawable bottomSheetBackground;
   @UiThread
   // bottom_sheet에 있는 element에게 출력할 데이터를 세팅하는 함수 정의
 
@@ -590,67 +570,53 @@ public abstract class CameraActivity extends AppCompatActivity
         if (recognition.getConfidence() != null) {
           if (recognition.getConfidence() > 0.55) {
             bottomSheetLayout.setVisibility(View.VISIBLE);
-            TextView info = findViewById(R.id.detected_item);
-            TextView value = findViewById(R.id.detected_item_info);
-            info.setVisibility(View.VISIBLE);
-            value.setVisibility(View.VISIBLE);
+
             if (recognition.getTitle() != null) {
-              //recognitionTextView.setText(recognition.getTitle());
-
-              // 분류명 속성에 bold 추가
-              //recognitionTextView.setTypeface(null, Typeface.BOLD);
-
-              //GradientDrawable drawable = (GradientDrawable) bottomSheetBackground.getBackground();
-              GradientDrawable bottomSheetBackground = (GradientDrawable) bottomSheetLayout.getBackground();
+              //bottomSheetBackground = (GradientDrawable) bottomSheetLayout.getBackground();
 
               switch (recognition.getTitle()) {
                 case "plastic" :
-                  recognitionImageView.setImageResource(R.drawable.img_plastic);
-                  recognitionTextView.setText("플라스틱류");
-                  recognitionInfoTextView.setText("내용물을 비우고 다른 재질로 된 부분(부착상표 등)을 제거한 후 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorBlue));
+                  setBottomSheet(R.drawable.img_plastic,
+                          "플라스틱류",
+                          "내용물을 비우고 다른 재질로 된 부분(부착상표 등)을 제거한 후 배출합니다",
+                          R.color.colorBlue);
                   break;
                 case "metal" :
-                  recognitionImageView.setImageResource(R.drawable.img_metal);
-                  recognitionTextView.setText("캔류");
-                  recognitionInfoTextView.setText("내용물을 비우고 겉 또는 속의 플라스틱 뚜껑 등은 제거한 후 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorGray));
+                  setBottomSheet(R.drawable.img_metal,
+                          "캔류",
+                          "내용물을 비우고 겉 또는 속의 플라스틱 뚜껑 등은 제거한 후 배출합니다",
+                          R.color.colorGray);
                   break;
                 case "glass" :
-                  recognitionImageView.setImageResource(R.drawable.img_glass);
-                  recognitionTextView.setText("유리류");
-                  recognitionInfoTextView.setText("병뚜껑을 제거한 후 내용물을 비우고 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorOrange));
+                  setBottomSheet(R.drawable.img_glass,
+                          "유리류",
+                          "병뚜껑을 제거한 후 내용물을 비우고 배출합니다",
+                          R.color.colorOrange);
                   break;
                 case "paper" :
-                  recognitionImageView.setImageResource(R.drawable.img_paper);
-                  recognitionTextView.setText("종이류");
-                  recognitionInfoTextView.setText("물기에 젖지 않도록 하고 펴서 차곡차곡 쌓은 후 묶어서 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorGreen));
+                  setBottomSheet(R.drawable.img_paper,
+                          "종이류",
+                          "물기에 젖지 않도록 하고 펴서 차곡차곡 쌓은 후 묶어서 배출합니다",
+                          R.color.colorGreen);
                   break;
                 case "clothes" :
-                  recognitionImageView.setImageResource(R.drawable.img_clothes);
-                  recognitionTextView.setText("의류");
-                  recognitionInfoTextView.setText("의류수거함에 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorPink));
+                  case "shoes" :
+                      setBottomSheet(R.drawable.img_clothes,
+                          "의류",
+                          "의류수거함에 배출합니다",
+                          R.color.colorPink);
                   break;
-                case "shoes" :
-                  recognitionImageView.setImageResource(R.drawable.img_clothes);
-                  recognitionTextView.setText("의류");
-                  recognitionInfoTextView.setText("의류수거함에 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorPink));
-                  break;
-                case "battery" :
-                  recognitionImageView.setImageResource(R.drawable.img_battery);
-                  recognitionTextView.setText("폐건전지");
-                  recognitionInfoTextView.setText("동 행정복지센터 및 아파트 내 전용수거함에 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorPurple));
+                  case "battery" :
+                    setBottomSheet(R.drawable.img_battery,
+                            "폐건전지",
+                            "동 행정복지센터 및 아파트 내 전용수거함에 배출합니다",
+                            R.color.colorPurple);
                   break;
                 default:
-                  recognitionImageView.setImageResource(R.drawable.img_trash);
-                  recognitionTextView.setText("일반쓰레기");
-                  recognitionInfoTextView.setText("일방 종량제 봉투에 담아서 배출합니다");
-                  bottomSheetBackground.setColor(ContextCompat.getColor(this, R.color.colorBrown));
+                  setBottomSheet(R.drawable.img_trash,
+                          "일반쓰레기",
+                          "일방 종량제 봉투에 담아서 배출합니다",
+                          R.color.colorBrown);
                   break;
               }
 
@@ -664,47 +630,22 @@ public abstract class CameraActivity extends AppCompatActivity
                 }
               });
             }
-            /* 사물 인식 퍼센트 출력
-            recognitionValueTextView.setText(
-                    String.format("%.2f", (100 * recognition.getConfidence())) + "%");
-             */
-
-            //Log.d("이름", recognitionTextView.getText().toString());
           } else { // 3. 아니면 invisible
             bottomSheetLayout.setVisibility(View.INVISIBLE);
           }
         }
       }
     }
-    /*
-    // 기존 코드 삭제
-    if (results != null && results.size() >= 3) {
-      Recognition recognition = results.get(0);
-      if (recognition != null) {
-        if (recognition.getTitle() != null) recognitionTextView.setText(recognition.getTitle());
-        if (recognition.getConfidence() != null)
-          recognitionValueTextView.setText(
-              String.format("%.2f", (100 * recognition.getConfidence())) + "%");
-      }
+  }
 
-      Recognition recognition1 = results.get(1);
-      if (recognition1 != null) {
-        if (recognition1.getTitle() != null) recognition1TextView.setText(recognition1.getTitle());
-        if (recognition1.getConfidence() != null)
-          recognition1ValueTextView.setText(
-              String.format("%.2f", (100 * recognition1.getConfidence())) + "%");
-      }
-
-      Recognition recognition2 = results.get(2);
-      if (recognition2 != null) {
-        if (recognition2.getTitle() != null) recognition2TextView.setText(recognition2.getTitle());
-        if (recognition2.getConfidence() != null)
-          recognition2ValueTextView.setText(
-              String.format("%.2f", (100 * recognition2.getConfidence())) + "%");
-      }
-    }
-
-     */
+  private void setBottomSheet(@DrawableRes int resid,
+                              String title,
+                              String value,
+                              @ColorRes int rescolor) {
+    recognitionImageView.setImageResource(resid);
+    recognitionTextView.setText(title);
+    recognitionInfoTextView.setText(value);
+    bottomSheetLayout.setBackgroundColor(ContextCompat.getColor(this, rescolor));
   }
 
   // 사물인식 metaData
