@@ -36,16 +36,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
-import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,25 +86,16 @@ public abstract class CameraActivity extends AppCompatActivity
   private int yRowStride;
   private Runnable postInferenceCallback;
   private Runnable imageConverter;
-  private FrameLayout bottomSheetLayout;
-  private LinearLayout gestureLayout;
-  private BottomSheetBehavior<LinearLayout> sheetBehavior;
+  private RelativeLayout bottomSheetLayout;
+  private LinearLayout gestureLayout, bottomSheetInfo;
   protected TextView recognitionTextView,
-      recognition1TextView,
-      recognition2TextView,
-      recognitionInfoTextView,
-      recognitionValueTextView,
-      recognition1ValueTextView,
-      recognition2ValueTextView;
+      recognitionInfoTextView;
   protected TextView frameValueTextView,
       cropValueTextView,
       cameraResolutionTextView,
       rotationTextView,
       inferenceTimeTextView;
-  protected ImageView bottomSheetArrowImageView;
-  private ImageView plusImageView, minusImageView, recognitionImageView;
-  private Spinner deviceSpinner;
-  private TextView threadsTextView;
+  private ImageView recognitionImageView;
 
   private Device device = Device.CPU;
   private int numThreads = -1;
@@ -114,6 +104,7 @@ public abstract class CameraActivity extends AppCompatActivity
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
     super.onCreate(null);
+
     // 화면을 켜진 상태로 유지
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -136,6 +127,7 @@ public abstract class CameraActivity extends AppCompatActivity
     deviceSpinner = findViewById(R.id.device_spinner);
     */
     bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
+    bottomSheetInfo = findViewById(R.id.bottom_sheet_info);
 
     // gestureLayout : bottom_sheet 에서 사물인식 결과의 텍스트가 나오는 layout
     gestureLayout = findViewById(R.id.gesture_layout);
@@ -572,8 +564,6 @@ public abstract class CameraActivity extends AppCompatActivity
             bottomSheetLayout.setVisibility(View.VISIBLE);
 
             if (recognition.getTitle() != null) {
-              //bottomSheetBackground = (GradientDrawable) bottomSheetLayout.getBackground();
-
               switch (recognition.getTitle()) {
                 case "plastic" :
                   setBottomSheet(R.drawable.img_plastic,
@@ -645,7 +635,7 @@ public abstract class CameraActivity extends AppCompatActivity
     recognitionImageView.setImageResource(resid);
     recognitionTextView.setText(title);
     recognitionInfoTextView.setText(value);
-    bottomSheetLayout.setBackgroundColor(ContextCompat.getColor(this, rescolor));
+    bottomSheetInfo.setBackgroundColor(ContextCompat.getColor(this, rescolor));
   }
 
   // 사물인식 metaData
@@ -674,18 +664,6 @@ public abstract class CameraActivity extends AppCompatActivity
   // bottom_sheet 안에 있는 device 의 값을 가져오는 함수
   protected Device getDevice() {
     return device;
-  }
-
-  private void setDevice(Device device) {
-    if (this.device != device) {
-      LOGGER.d("Updating  device: " + device);
-      this.device = device;
-      final boolean threadsEnabled = device == Device.CPU;
-      plusImageView.setEnabled(threadsEnabled);
-      minusImageView.setEnabled(threadsEnabled);
-      threadsTextView.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
-      onInferenceConfigurationChanged();
-    }
   }
 
   // integer 형으로 변환한 bottom_sheet 안에 있는 Threads의 값을 가져오는 함수
